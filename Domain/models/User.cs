@@ -13,6 +13,8 @@ namespace Domain.Models
         public string Username;
         public string Password;
 
+        public User() : this(0, "", "", "", "") { }
+
         public User(
             int id,
             string phone,
@@ -39,6 +41,8 @@ namespace Domain.Models
                 return Result.Fail("Empty phone number.");
             if (string.IsNullOrEmpty(Fullname))
                 return Result.Fail("Empty fullname.");
+            if (Id < 0)
+                return Result.Fail("Incorrect user id.");
 
             return Result.Ok();
         }

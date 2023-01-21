@@ -16,7 +16,7 @@ namespace Domain.Logic
 
         public bool Success { get; }
         public string Error { get; }
-        public bool Failure => !Success;
+        public bool isFailure => !Success;
 
         public static Result Fail(string message)
         {
@@ -25,7 +25,7 @@ namespace Domain.Logic
 
         public static Result<T> Fail<T>(string message)
         {
-            return new Result<T>(default, false, message);
+            return new Result<T>(default!, false, message);
         }
 
         public static Result Ok()
@@ -36,6 +36,10 @@ namespace Domain.Logic
         public static Result<T> Ok<T>(T value)
         {
             return new Result<T>(value, true, string.Empty);
+        }
+        public static bool operator &(Result result1, Result result2)
+        {
+            return result1.Success && result2.Success;
         }
     }
 
