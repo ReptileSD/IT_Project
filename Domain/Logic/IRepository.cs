@@ -13,9 +13,5 @@ namespace Domain.Logic
         void Save();
     }
 
-    public interface IUserRepository : IRepository<User>
-    {
-        User GetUserByLogin(string login);
-        bool CreateUser(User user);
-    }
+
 }
