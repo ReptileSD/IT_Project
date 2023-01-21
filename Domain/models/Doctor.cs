@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Domain.models
+﻿namespace Domain.Models
 {
     public class Doctor
     {
