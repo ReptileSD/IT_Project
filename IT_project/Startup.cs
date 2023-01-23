@@ -1,6 +1,11 @@
+using Database;
+using Database.Repository;
+using Domain.Logic;
+using Domain.UseCases;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +28,24 @@ namespace IT_project
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationContext>(options =>
+    options.UseNpgsql(Configuration.GetConnectionString("DATABASE_URL")));
+            services.AddDbContext<ApplicationContext>(options =>
+    options.EnableSensitiveDataLogging(true));
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ITimeTableRepository, TimeTableRepository>();
+            services.AddTransient<IAppointmentRepository, AppointmentsRepository>();
+            services.AddTransient<IDoctorRepository, DoctorRepository>();
+            services.AddTransient<ISpecializationRepository, SpecializationRepository>();
+            services.AddTransient<UserInteractor>();
+            services.AddTransient<DoctorInteractor>();
+            services.AddTransient<TimeTableInteractor>();
+            services.AddTransient<AppointmentInteractor>();
+            
             services.AddRazorPages();
+
+            services.AddControllers();
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -31,7 +53,12 @@ namespace IT_project
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(options =>
+                {
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                    options.RoutePrefix = string.Empty;
+                });
             }
             else
             {
@@ -49,6 +76,7 @@ namespace IT_project
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });
         }
