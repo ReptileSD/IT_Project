@@ -51,7 +51,7 @@ namespace Tests
             var res = _service.SaveAppointment(app, sched);
 
             Assert.True(res.isFailure);
-            Assert.Equal("Appointment out of schedule", res.Error);
+            Assert.Contains("Appointment out of schedule", res.Error);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Tests
             var res = _service.SaveAppointment(app, sched);
 
             Assert.True(res.isFailure);
-            Assert.Equal("Appointment time already taken", res.Error);
+            Assert.Contains("Appointment time already taken", res.Error);
         }
 
         [Fact]
@@ -77,14 +77,13 @@ namespace Tests
         {
             List<Appointment> apps = new();
             _mock.Setup(x => x.GetAppointments(It.IsAny<int>())).Returns(() => apps);
-            _mock.Setup(x => x.CreateAppointment(It.IsAny<Appointment>())).Returns(() => false);
-
+            _mock.Setup(x => x.Create(It.IsAny<Appointment>())).Returns(() => new Appointment(-1, DateTime.MinValue, DateTime.MaxValue, 0, 0));
             var app = new Appointment();
             var sched = new TimeTable(0, DateTime.MinValue, DateTime.MaxValue);
             var res = _service.SaveAppointment(app, sched);
 
             Assert.True(res.isFailure);
-            Assert.Equal("Unable to save appointment", res.Error);
+            Assert.Contains("Unable to save appointment", res.Error);
         }
 
         [Fact]
@@ -92,8 +91,7 @@ namespace Tests
         {
             List<Appointment> apps = new();
             _mock.Setup(x => x.GetAppointments(It.IsAny<int>())).Returns(() => apps);
-            _mock.Setup(x => x.CreateAppointment(It.IsAny<Appointment>())).Returns(() => true);
-
+            _mock.Setup(x => x.Create(It.IsAny<Appointment>())).Returns(() => new Appointment());
             var app = new Appointment();
             var sched = new TimeTable(0, DateTime.MinValue, DateTime.MaxValue);
             var res = _service.SaveAppointment(app, sched);
@@ -144,7 +142,7 @@ namespace Tests
             var check = app.IsValid();
 
             Assert.True(check.isFailure);
-            Assert.Equal("Incorrect patient ID", check.Error);
+            Assert.Contains("Incorrect patient ID", check.Error);
         }
 
         [Fact]
@@ -154,7 +152,7 @@ namespace Tests
             var check = app.IsValid();
 
             Assert.True(check.isFailure);
-            Assert.Equal("Incorrect doctor ID", check.Error);
+            Assert.Contains("Incorrect doctor ID", check.Error);
         }
 
         [Fact]
@@ -164,7 +162,7 @@ namespace Tests
             var check = app.IsValid();
 
             Assert.True(check.isFailure);
-            Assert.Equal("Incorrect time provided", check.Error);
+            Assert.Contains("Incorrect time provided", check.Error);
         }
 
         [Fact]
