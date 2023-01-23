@@ -6,6 +6,7 @@ namespace Domain.Models
 {
     public class TimeTable
     {
+        public int Id;
         public int DoctorId;
         public DateTime StartDate;
         public DateTime EndDate;
@@ -23,6 +24,8 @@ namespace Domain.Models
 
         public Result IsValid()
         {
+            if (Id < 0)
+                return Result.Fail("Incorrect id");
             if (DoctorId < 0)
                 return Result.Fail("Incorrect doctor id.");
             if (StartDate > EndDate)

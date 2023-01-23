@@ -20,24 +20,28 @@ namespace Domain.UseCases
 
             if (_db.GetUserByLogin(user.Username) != null)
                 return Result.Fail<User>("User with this username already exists.");
+            if (_db.Create(user))
+            {
+                _db.Save();
+                return Result.Ok(user);
+            }
 
-
-            return _db.CreateUser(user) ? Result.Ok(user) : Result.Fail<User>("Error while creating user.");
+            return Result.Fail<User>("User creating error");
         }
         public Result<User> GetUserByLogin(string login)
         {
             if (string.IsNullOrEmpty(login))
                 return Result.Fail<User>("Login error.");
 
-            return _db.GetUserByLogin(login) != null ? Result.Ok(_db.GetUserByLogin(login)) : Result.Fail<User>("User not found.");
+            return _db.GetUserByLogin(login) != null ? Result.Ok(_db.GetUserByLogin(login)!) : Result.Fail<User>("User not found");
         }
 
-        public Result IsUserExists(string login)
+        public Result<User> IsUserExists(string login)
         {
             if (string.IsNullOrEmpty(login))
-                return Result.Fail("Login error.");
-
-            return _db.GetUserByLogin(login) != null ? Result.Ok() : Result.Fail("User not found.");
+                return Result.Fail<User>("Login error");
+            var res = _db.GetUserByLogin(login);
+            return res != null ? Result.Ok(res) : Result.Fail<User>("User not found");
         }
     }
 }
