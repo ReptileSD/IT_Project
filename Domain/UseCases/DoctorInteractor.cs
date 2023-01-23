@@ -49,7 +49,7 @@ namespace Domain.UseCases
         public Result<Doctor> DeleteDoctor(int id)
         {
             var res = _apdb.GetAppointments(id);
-            if (_apdb.GetAppointments(id).Any())
+            if (res.Any())
                 return Result.Fail<Doctor>("Cannot delete doctor. Doctor has appointments");
             var result = GetDoctor(id);
             if (result.isFailure)
@@ -60,6 +60,10 @@ namespace Domain.UseCases
                 return result;
             }
             return Result.Fail<Doctor>("Cannot delete the doctor");
+        }
+        public Result<IEnumerable<Doctor>> GetAllDoctors()
+        {
+            return Result.Ok(_db.GetAll());
         }
     }
 }

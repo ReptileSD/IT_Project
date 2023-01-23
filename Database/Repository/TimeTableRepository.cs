@@ -53,9 +53,16 @@ namespace Database.Repository
             context.SaveChangesAsync();
         }
 
-        public TimeTable Update(TimeTable item)
+        public TimeTable? Update(TimeTable item)
         {
-            return context.TimeTables.Update(item.ToModel()).Entity.ToDomain();
+            try
+            {
+                return context.TimeTables.Update(item.ToModel()).Entity.ToDomain();
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

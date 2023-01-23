@@ -23,29 +23,31 @@ namespace Database.Repository
 
         public Specialization? Delete(int id)
         {
-            var item = GetItem(id);
-            if (item == default)
+            var spec = context.Specializations.FirstOrDefault(s => s.Id == id);
+            if (spec == default)
                 return null;
-            return context.Remove(item.ToModel()).Entity.ToDomain();
-        }
 
-        public Specialization? Get(string name)
-        {
-            throw new NotImplementedException();
+            return context.Specializations.Remove(spec).Entity.ToDomain();
         }
 
         public IEnumerable<Specialization> GetAll()
         {
-            return context.Specializations.Select(item => item.ToDomain());
+            return context.Specializations.Select(s => s.ToDomain());
+        }
+
+        public Specialization? Get(string name)
+        {
+            return context.Specializations.FirstOrDefault(s => s.Name == name)?.ToDomain();
         }
 
         public Specialization? GetItem(int id)
         {
-            return context.Specializations.FirstOrDefault(item => item.Id == id)?.ToDomain();
+            return context.Specializations.FirstOrDefault(s => s.Id == id)?.ToDomain();
         }
+
         public void Save()
         {
-            context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         public Specialization Update(Specialization item)

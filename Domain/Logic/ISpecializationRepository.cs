@@ -1,5 +1,4 @@
-﻿using Domain.Logic;
-using Domain.Models;
+﻿using Domain.Models;
 
 namespace Domain.Logic
 {
