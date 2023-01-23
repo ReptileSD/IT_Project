@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Collections.Generic;
 using Domain.Models;
+using System.Threading;
 
 namespace Domain.UseCases
 {
     public class AppointmentInteractor
     {
         private readonly IAppointmentRepository _db;
+        private static readonly Dictionary<int, Mutex> _mutexDictionary = new Dictionary<int, Mutex>();
 
         public AppointmentInteractor(IAppointmentRepository db)
         {
@@ -35,9 +37,13 @@ namespace Domain.UseCases
                 if (appointments[index + 1].StartDate < appointment.EndDate)
                     return Result.Fail<Appointment>("Appointment time already taken");
             }
+            if (!_mutexDictionary.ContainsKey(appointment.DoctorId))
+                _mutexDictionary.Add(appointment.DoctorId, new Mutex());
+            _mutexDictionary.First(d => d.Key == appointment.DoctorId).Value.WaitOne();
             if (_db.Create(appointment).IsValid().Success)
             {
                 _db.Save();
+                _mutexDictionary.First(d => d.Key == appointment.DoctorId).Value.ReleaseMutex();
                 return Result.Ok(appointment);
             }
             return Result.Fail<Appointment>("Unable to save appointment");

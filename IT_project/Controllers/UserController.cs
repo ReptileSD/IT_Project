@@ -2,7 +2,8 @@
 using Domain.Models;
 using IT_Project.Serializers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Win32;
+using Microsoft.AspNetCore.Authorization;
+using IT_Project.Auth;
 
 namespace HospitalProjectIT.Controllers
 {
@@ -15,7 +16,7 @@ namespace HospitalProjectIT.Controllers
         {
             _users = users;
         }
-
+        [Authorize]
         [HttpGet("getUserByLogin")]
         public ActionResult<UserSerializer> GetUserByLogin(string login)
         {
@@ -51,6 +52,7 @@ namespace HospitalProjectIT.Controllers
                 PhoneNumber = register.Value.Phone,
                 Fullname = register.Value.Fullname,
                 Role = register.Value.Role,
+                Token = TokenManager.GenerateToken(register.Value.Username),
             });
         }
 
@@ -70,6 +72,27 @@ namespace HospitalProjectIT.Controllers
                 Fullname = res.Value.Fullname,
                 Role = res.Value.Role,
             });
+        }
+        [HttpGet("login")]
+        public IActionResult Login(string username, string password)
+        {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                return BadRequest();
+            var result = _users.GetUserByLogin(username);
+            if (result.isFailure)
+                return NotFound("Invalid login or password");
+            if (result.Value.Password != password)
+                return Unauthorized("Invalid login or password");
+            return Ok(new UserSerializer
+            {
+                Id = result.Value.Id,
+                username = result.Value.Username,
+                PhoneNumber = result.Value.Phone,
+                Fullname = result.Value.Fullname,
+                Role = result.Value.Role,
+                Token = TokenManager.GenerateToken(username),
+            });
+
         }
     }
 }

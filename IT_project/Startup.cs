@@ -13,6 +13,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using IT_Project.Auth;
 
 namespace IT_project
 {
@@ -46,6 +49,21 @@ namespace IT_project
 
             services.AddControllers();
             services.AddSwaggerGen();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                            .AddJwtBearer(options =>
+                            {
+                                options.TokenValidationParameters = new TokenValidationParameters
+                                {
+                                    ValidateIssuer = true,
+                                    ValidateAudience = true,
+                                    ValidateLifetime = true,
+                                    ValidateIssuerSigningKey = true,
+                                    ValidIssuer = AuthOptions.ISSUER,
+                                    ValidAudience = AuthOptions.AUDIENCE,
+                                    IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey()
+                                };
+                            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

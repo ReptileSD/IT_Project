@@ -2,6 +2,7 @@
 using Domain.UseCases;
 using Domain.Models;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace IT_Project.Controllers
@@ -17,6 +18,7 @@ namespace IT_Project.Controllers
             _timetables = timetable;
             _appointments = appointment;
         }
+        [Authorize]
         [HttpPost("save")]
         public IActionResult SaveAppointment(int patientId,
             int doctorId,

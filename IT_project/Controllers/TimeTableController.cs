@@ -2,6 +2,7 @@
 using Domain.UseCases;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IT_Project.Controllers
 {
@@ -17,7 +18,7 @@ namespace IT_Project.Controllers
             _timetables = timetables;
             _doctors = doctors;
         }
-
+        [Authorize]
         [HttpPost("create")]
         public IActionResult AddTimeTable(int doctor_id, DateTime start_time, DateTime end_time)
         {
@@ -28,7 +29,7 @@ namespace IT_Project.Controllers
                 return Problem(statusCode: 404, detail: res.Error);
             return Ok(res.Value);
         }
-
+        [Authorize]
         [HttpGet("update")]
         public IActionResult UpdateTimeTable(int timetable_id, int? doctor_id, DateTime? startdate, DateTime? enddate)
         {
@@ -72,6 +73,7 @@ namespace IT_Project.Controllers
                 return Problem(statusCode: 404, detail: res.Error);
             return Ok(res.Value);
         }
+        [Authorize]
         [HttpDelete("delete")]
         public IActionResult DeleteTimeTable(int id)
         {
