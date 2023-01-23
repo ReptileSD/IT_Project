@@ -1,6 +1,6 @@
 ﻿using Domain.Logic;
 using Domain.Models;
-using Domain.Logic.Interfaces;
+using Domain.Logic;
 using System.Collections.Generic;
 
 namespace Domain.UseCases
@@ -14,20 +14,25 @@ namespace Domain.UseCases
             _db = db;
         }
 
-        public Result<IEnumerable<TimeTable>> getSchedule(Doctor doctor)
+        public Result<TimeTable> getTimeTable(Doctor doctor)
         {
             var result = doctor.IsValid();
             if (result.isFailure)
-                return Result.Fail<IEnumerable<TimeTable>>("Cannot delete timetable");
-            return Result.Ok(_db.getTimeTable(doctor));
+                return Result.Fail<TimeTable>("Cannot get timetable");
+            return Result.Ok(_db.GetItem(doctor.Id)!);
         }
 
-        public Result<TimeTable> CreateSchedule(Doctor doctor, TimeTable schedule)
+        public Result<TimeTable> CreateTimeTable(Doctor doctor, TimeTable timetable)
         {
-            var result = doctor.IsValid() & schedule.IsValid();
+            var result = doctor.IsValid() & timetable.IsValid();
             if (!result)
                 return Result.Fail<TimeTable>("Cannot create timetable");
-            return _db.CreateTimeTable(doctor, schedule) ? Result.Ok(schedule) : Result.Fail<TimeTable>("Unable to add timetable");
+            if (_db.Create(timetable).Id >= 0)
+            {
+                _db.Save();
+                return Result.Ok(timetable);
+            }
+            return Result.Fail<TimeTable>("Unable to add timetable");
         }
 
     }
